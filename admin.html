@@ -15,17 +15,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg0: #06080F;
-  --bg1: #0D1020;
-  --bg2: #131726;
-  --bg3: #181d2e;
-  --gold: #C9A84C;
-  --gold-light: #E8D5A3;
-  --gold-dim: rgba(201,168,76,0.10);
-  --gold-border: rgba(201,168,76,0.22);
-  --text: #E8E8F0;
-  --text-muted: #8A8FAA;
-  --border-sub: rgba(255,255,255,0.06);
+  --bg0: #0A0A0A;
+  --bg1: #111111;
+  --bg2: #161616;
+  --bg3: #1A1A1A;
+  --gold: #E5E4E2;
+  --gold-light: #F7E7CE;
+  --gold-dim: rgba(229,228,226,0.07);
+  --gold-border: rgba(229,228,226,0.14);
+  --emerald: #0B3D2E;
+  --emerald-h: #134a38;
+  --platinum: #DADADA;
+  --text: #E5E4E2;
+  --text-muted: #787878;
+  --border-sub: rgba(255,255,255,0.05);
   --radius: 14px;
 }
 
@@ -40,15 +43,16 @@ body {
   visibility: hidden;
 }
 
-body.ready { visibility: visible; }
+body.ready { visibility: visible; animation: pageIn 0.55s cubic-bezier(.25,.46,.45,.94) both; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 40% at 10% 0%, rgba(201,168,76,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,168,76,0.035) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 40% at 10% 0%, rgba(229,228,226,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(229,228,226,0.035) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
 }
@@ -59,7 +63,7 @@ body::before {
   top: 0;
   z-index: 100;
   width: 100%;
-  background: rgba(6,8,15,0.92);
+  background: rgba(10,10,10,0.92);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-sub);
   padding: 0 40px;
@@ -122,7 +126,7 @@ body::before {
 
 .btn-logout {
   background: transparent;
-  border: 1px solid rgba(201,168,76,0.3);
+  border: 1px solid rgba(229,228,226,0.3);
   border-radius: 8px;
   color: var(--text-muted);
   font-family: 'DM Sans', sans-serif;
@@ -130,9 +134,9 @@ body::before {
   font-weight: 400;
   padding: 7px 16px;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.4s, color 0.4s, transform 0.4s cubic-bezier(.25,.46,.45,.94);
 }
-.btn-logout:hover { border-color: var(--gold); color: var(--gold); }
+.btn-logout:hover { border-color: var(--gold); color: var(--gold); transform: scale(1.03); }
 
 /* ── Page body ── */
 .page {
@@ -147,7 +151,7 @@ body::before {
 .welcome-eyebrow {
   font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 10px;
@@ -213,13 +217,13 @@ body::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.055) 0%, transparent 70%);
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(229,228,226,0.055) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
 }
 
-.stat-card:hover { border-color: rgba(201,168,76,0.5); box-shadow: 0 0 36px rgba(201,168,76,0.1); }
+.stat-card:hover { border-color: rgba(229,228,226,0.5); box-shadow: 0 0 36px rgba(229,228,226,0.1); }
 .stat-card:hover::before { opacity: 1; }
 
 .stat-label {
@@ -405,8 +409,8 @@ tbody td {
 <header class="header">
   <a href="/" class="nav-logo">
     <svg class="logo-diamond" viewBox="0 0 40 40" fill="none">
-      <polygon points="20,2 38,14 38,26 20,38 2,26 2,14" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,0.05)"/>
-      <polygon points="20,8 32,16 32,24 20,32 8,24 8,16" stroke="#C9A84C" stroke-width="0.5" fill="rgba(201,168,76,0.08)"/>
+      <polygon points="20,2 38,14 38,26 20,38 2,26 2,14" stroke="#C9A84C" stroke-width="1" fill="rgba(229,228,226,0.05)"/>
+      <polygon points="20,8 32,16 32,24 20,32 8,24 8,16" stroke="#C9A84C" stroke-width="0.5" fill="rgba(229,228,226,0.08)"/>
       <line x1="20" y1="2" x2="20" y2="38" stroke="#C9A84C" stroke-width="0.4" opacity="0.5"/>
       <line x1="2" y1="14" x2="38" y2="26" stroke="#C9A84C" stroke-width="0.4" opacity="0.5"/>
       <line x1="2" y1="26" x2="38" y2="14" stroke="#C9A84C" stroke-width="0.4" opacity="0.5"/>
