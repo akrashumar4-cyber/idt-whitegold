@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>International Diamond Trade</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #06080F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Georgia', serif;
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.logo-text {
+  color: #C9A84C;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(201, 168, 76, 0.15);
+  border-top-color: #C9A84C;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+<div class="loader">
+  <div class="logo-text">International Diamond Trade</div>
+  <div class="spinner"></div>
+</div>
+
+<script>
+const db = supabase.createClient(
+  'https://hlmdkhixdrowbnxgbuvy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsbWRraGl4ZHJvd2JueGdidXZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NDIzMjQsImV4cCI6MjA5MjAxODMyNH0.2QOyrIHHReHH2prRCP78UcO1I3oCqauKpn_0pjpP7W8'
+);
+
+async function getSessionWithRetry() {
+  for (let i = 0; i < 10; i++) {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) return session;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  return null;
+}
+
+(async () => {
+  const session = await getSessionWithRetry();
+
+  if (!session) {
+    window.location.replace('https://internationaldiamondtrade.com/login.html');
+    return;
+  }
+
+  const role = session.user.user_metadata?.role;
+
+  if (role === 'admin') {
+    window.location.replace('/admin.html');
+  } else if (role === 'supplier') {
+    window.location.replace('/supplier.html');
+  } else {
+    window.location.replace('/buyer.html');
+  }
+})();
+</script>
+</body>
+</html>
