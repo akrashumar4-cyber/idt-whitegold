@@ -3,404 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — International Diamond Trade</title>
-<meta name="description" content="IDT admin dashboard. Manage users, roles, and platform activity.">
-
+<title>Admin Portal — International Diamond Trade</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-:root {
-  --bg0: #0A0A0A;
-  --bg1: #111111;
-  --bg2: #161616;
-  --bg3: #1A1A1A;
-  --gold: #E5E4E2;
-  --gold-light: #F7E7CE;
-  --gold-dim: rgba(229,228,226,0.07);
-  --gold-border: rgba(229,228,226,0.14);
-  --emerald: #0B3D2E;
-  --emerald-h: #134a38;
-  --platinum: #DADADA;
-  --text: #E5E4E2;
-  --text-muted: #787878;
-  --border-sub: rgba(255,255,255,0.05);
-  --radius: 14px;
+:root{
+  --bg0:#0A0A0A;
+  --bg1:#111111;
+  --bg2:#161616;
+  --bg3:#1A1A1A;
+  --gold:#E5E4E2;
+  --gold-light:#F7E7CE;
+  --gold-dim:rgba(229,228,226,0.07);
+  --gold-border:rgba(229,228,226,0.14);
+  --emerald:#0B3D2E;
+  --emerald-h:#134a38;
+  --platinum:#DADADA;
+  --text:#E5E4E2;
+  --text-muted:#787878;
+  --border-sub:rgba(255,255,255,0.05);
+  --radius:14px;
+  --green:#4CAF7D;
+  --amber:#D4943A;
+  --blue:#7EC8E3;
 }
 
-html { scroll-behavior: smooth; }
+html{scroll-behavior:smooth}
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg0);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  visibility: hidden;
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg0);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  animation:pageIn .55s cubic-bezier(.25,.46,.45,.94) both;
 }
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-body.ready { visibility: visible; animation: pageIn 0.55s cubic-bezier(.25,.46,.45,.94) both; }
-@keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
+body::before{
+  content:'';position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 70% 40% at 10% 0%, rgba(229,228,226,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(229,228,226,0.035) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
+    radial-gradient(ellipse 60% 40% at 10% 0%,rgba(229,228,226,0.02) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 90% 100%,rgba(229,228,226,0.015) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
 }
 
 /* ── Header ── */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  width: 100%;
-  background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-sub);
-  padding: 0 40px;
-  height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+.header{
+  position:sticky;top:0;z-index:100;width:100%;
+  background:rgba(10,10,10,0.93);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border-sub);
+  padding:0 48px;height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px;
 }
-
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  text-decoration: none;
-  color: inherit;
-  flex-shrink: 0;
+.nav-logo{display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit;flex-shrink:0}
+.logo-diamond{width:32px;height:32px}
+.logo-text{
+  font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;
+  letter-spacing:0.08em;color:var(--gold-light);display:flex;flex-direction:column;line-height:1;gap:3px;
 }
-
-.logo-diamond { width: 34px; height: 34px; }
-
-.logo-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--gold-light);
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-  gap: 3px;
+.logo-sub{
+  font-size:0.5rem;font-family:'DM Sans',sans-serif;font-weight:300;
+  letter-spacing:0.24em;text-transform:uppercase;color:var(--text-muted);
 }
-
-.logo-sub {
-  font-size: 0.55rem;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.header-right{display:flex;align-items:center;gap:14px}
+.badge-role{
+  font-size:0.64rem;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);
+  border-radius:20px;padding:4px 14px;
 }
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.btn-signout{
+  background:transparent;border:1px solid rgba(229,228,226,0.15);border-radius:8px;
+  color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:400;
+  padding:7px 18px;cursor:pointer;letter-spacing:0.04em;
+  transition:border-color .4s,color .4s,transform .4s cubic-bezier(.25,.46,.45,.94);
 }
+.btn-signout:hover{border-color:var(--gold);color:var(--gold);transform:scale(1.03)}
 
-.badge-admin {
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold);
-  background: var(--gold-dim);
-  border: 1px solid var(--gold-border);
-  border-radius: 20px;
-  padding: 4px 12px;
-}
-
-.btn-logout {
-  background: transparent;
-  border: 1px solid rgba(229,228,226,0.3);
-  border-radius: 8px;
-  color: var(--text-muted);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 400;
-  padding: 7px 16px;
-  cursor: pointer;
-  transition: border-color 0.4s, color 0.4s, transform 0.4s cubic-bezier(.25,.46,.45,.94);
-}
-.btn-logout:hover { border-color: var(--gold); color: var(--gold); transform: scale(1.03); }
-
-/* ── Page body ── */
-.page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 52px 40px 96px;
-  position: relative;
-  z-index: 1;
-}
+/* ── Page ── */
+.page{max-width:1280px;margin:0 auto;padding:56px 48px 100px;position:relative;z-index:1}
 
 /* ── Welcome ── */
-.welcome-eyebrow {
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 10px;
+.welcome-eyebrow{
+  font-size:0.64rem;font-weight:400;letter-spacing:0.28em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:12px;
 }
+.welcome-heading{
+  font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,3.5vw,2.9rem);
+  font-weight:400;color:var(--gold-light);letter-spacing:0.01em;margin-bottom:8px;
+}
+.welcome-sub{font-size:0.9rem;color:var(--text-muted);font-weight:300;margin-bottom:52px}
 
-.welcome-heading {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.9rem, 3.5vw, 2.8rem);
-  font-weight: 400;
-  color: var(--gold-light);
-  letter-spacing: 0.01em;
-  margin-bottom: 6px;
+/* ── Stats row (4 cols) ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:56px}
+.stat-card{
+  background:var(--bg1);border:1px solid var(--gold-border);border-radius:var(--radius);padding:28px 24px;
+  position:relative;overflow:hidden;
+  transition:border-color .45s,box-shadow .45s,transform .45s cubic-bezier(.25,.46,.45,.94);
 }
+.stat-card:hover{border-color:rgba(229,228,226,0.28);box-shadow:0 16px 48px rgba(0,0,0,0.4);transform:translateY(-2px)}
+.stat-num{
+  font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;
+  color:var(--gold-light);line-height:1;display:block;margin-bottom:8px;
+}
+.stat-lbl{font-size:0.68rem;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted)}
 
-.welcome-sub {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  font-weight: 300;
-  margin-bottom: 52px;
-}
+/* ── Divider ── */
+.divider{height:1px;background:var(--border-sub);margin:52px 0 44px}
 
 /* ── Section label ── */
-.section-label {
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.section-label{
+  font-size:0.64rem;font-weight:400;letter-spacing:0.24em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:20px;display:flex;align-items:center;gap:14px;
 }
-.section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border-sub);
-}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border-sub)}
 
-/* ── Stats row ── */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 48px;
+/* ── Table ── */
+.table-wrap{
+  background:var(--bg1);border:1px solid var(--gold-border);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:52px;
 }
-
-.stat-card {
-  background: var(--bg1);
-  border: 1px solid var(--gold-border);
-  border-radius: var(--radius);
-  padding: 28px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.3s, box-shadow 0.3s;
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:0.875rem}
+thead tr{background:var(--bg2);border-bottom:1px solid var(--gold-border)}
+thead th{
+  text-align:left;padding:14px 20px;
+  font-size:0.62rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--text-muted);white-space:nowrap;
 }
+tbody tr{border-bottom:1px solid var(--border-sub);transition:background .18s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,0.028)}
+tbody td{padding:15px 20px;color:var(--text);vertical-align:middle}
 
-.stat-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(229,228,226,0.055) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
+.td-name{font-weight:500;color:var(--gold-light)}
+.td-loc{font-size:0.82rem;color:var(--text-muted)}
+.td-num{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold-light)}
+.td-date{font-size:0.8rem;color:var(--text-muted)}
+
+.badge-active-sm{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:0.62rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--green);background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.22);
+  border-radius:20px;padding:3px 10px;
+}
+.badge-active-sm::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0}
+
+.role-supplier{color:#A8D5A2;background:rgba(168,213,162,0.1);border:1px solid rgba(168,213,162,0.22)}
+.role-buyer{color:var(--blue);background:rgba(126,200,227,0.1);border:1px solid rgba(126,200,227,0.22)}
+.role-badge{
+  display:inline-flex;align-items:center;
+  font-size:0.62rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
+  border-radius:20px;padding:3px 10px;
 }
 
-.stat-card:hover { border-color: rgba(229,228,226,0.5); box-shadow: 0 0 36px rgba(229,228,226,0.1); }
-.stat-card:hover::before { opacity: 1; }
+/* ── Inquiries feed ── */
+.feed{display:flex;flex-direction:column;gap:0}
+.feed-item{
+  display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
+  padding:18px 24px;background:var(--bg1);border:1px solid var(--gold-border);
+  border-bottom:none;
+  transition:background .18s;
+}
+.feed-item:first-child{border-radius:var(--radius) var(--radius) 0 0}
+.feed-item:last-child{border-bottom:1px solid var(--gold-border);border-radius:0 0 var(--radius) var(--radius)}
+.feed-item:hover{background:rgba(255,255,255,0.025)}
 
-.stat-label {
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.feed-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold-border);flex-shrink:0;
+}
+.feed-dot.new-dot{background:var(--gold);box-shadow:0 0 6px rgba(229,228,226,0.3)}
+
+.feed-parties{font-size:0.875rem;font-weight:500;color:var(--gold-light);margin-bottom:3px}
+.feed-subject{font-size:0.8rem;color:var(--text-muted)}
+
+.feed-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.feed-time{font-size:0.74rem;color:var(--text-muted)}
+
+.badge-new-feed{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:0.6rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);
+  border-radius:20px;padding:2px 10px;
+}
+.badge-responded-feed{
+  display:inline-flex;align-items:center;
+  font-size:0.6rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--text-muted);background:rgba(255,255,255,0.04);border:1px solid var(--border-sub);
+  border-radius:20px;padding:2px 10px;
+}
+.badge-pending-feed{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:0.6rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--amber);background:rgba(212,148,58,0.1);border:1px solid rgba(212,148,58,0.22);
+  border-radius:20px;padding:2px 10px;
 }
 
-.stat-value {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.4rem;
-  font-weight: 400;
-  color: var(--gold-light);
-  line-height: 1;
+@media(max-width:1000px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){
+  .header{padding:0 20px}
+  .page{padding:36px 20px 72px}
 }
-
-.stat-value.loading {
-  font-size: 1.5rem;
-  color: var(--text-muted);
-  animation: pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-/* ── Users table ── */
-.table-wrap {
-  background: var(--bg1);
-  border: 1px solid var(--gold-border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.table-scroll { overflow-x: auto; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-}
-
-thead tr {
-  background: var(--bg2);
-  border-bottom: 1px solid var(--gold-border);
-}
-
-thead th {
-  text-align: left;
-  padding: 14px 20px;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-tbody tr {
-  border-bottom: 1px solid var(--border-sub);
-  transition: background 0.15s;
-}
-
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: rgba(255,255,255,0.025); }
-
-tbody td {
-  padding: 14px 20px;
-  color: var(--text);
-  vertical-align: middle;
-}
-
-.company-name {
-  font-weight: 500;
-  color: var(--gold-light);
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.email-cell {
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.role-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.role-badge.buyer   { color: #7EC8E3; background: rgba(126,200,227,0.1); border: 1px solid rgba(126,200,227,0.22); }
-.role-badge.supplier { color: #A8D5A2; background: rgba(168,213,162,0.1); border: 1px solid rgba(168,213,162,0.22); }
-.role-badge.admin   { color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-border); }
-.role-badge.pending { color: var(--text-muted); background: rgba(138,143,170,0.1); border: 1px solid rgba(138,143,170,0.2); }
-
-.date-cell {
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
-
-/* ── Role dropdown ── */
-.role-select {
-  background: var(--bg2);
-  border: 1px solid var(--gold-border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.82rem;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 28px;
-  min-width: 110px;
-}
-.role-select:hover, .role-select:focus { border-color: var(--gold); outline: none; }
-
-.role-select.saving { opacity: 0.5; pointer-events: none; }
-
-/* ── Empty / loading states ── */
-.table-empty {
-  text-align: center;
-  padding: 56px 20px;
-  color: var(--text-muted);
-  font-size: 0.88rem;
-}
-
-.divider { height: 1px; background: var(--border-sub); margin: 48px 0 36px; }
-
-/* ── Toast ── */
-.toast {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 999;
-  background: var(--bg2);
-  border: 1px solid var(--gold-border);
-  border-radius: 10px;
-  padding: 12px 20px;
-  font-size: 0.84rem;
-  color: var(--gold-light);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  transform: translateY(80px);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  pointer-events: none;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.error { border-color: rgba(239,68,68,0.4); color: #FCA5A5; }
-
-@media (max-width: 900px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .header { padding: 0 20px; }
-  .page { padding: 36px 20px 72px; }
-}
-@media (max-width: 560px) {
-  .stats-row { grid-template-columns: 1fr 1fr; }
-  .badge-admin { display: none; }
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .feed-item{grid-template-columns:auto 1fr;gap:12px}
+  .feed-right{display:none}
 }
 </style>
 </head>
@@ -409,54 +217,51 @@ tbody td {
 <header class="header">
   <a href="/" class="nav-logo">
     <svg class="logo-diamond" viewBox="0 0 40 40" fill="none">
-      <polygon points="20,2 38,14 38,26 20,38 2,26 2,14" stroke="#C9A84C" stroke-width="1" fill="rgba(229,228,226,0.05)"/>
-      <polygon points="20,8 32,16 32,24 20,32 8,24 8,16" stroke="#C9A84C" stroke-width="0.5" fill="rgba(229,228,226,0.08)"/>
-      <line x1="20" y1="2" x2="20" y2="38" stroke="#C9A84C" stroke-width="0.4" opacity="0.5"/>
-      <line x1="2" y1="14" x2="38" y2="26" stroke="#C9A84C" stroke-width="0.4" opacity="0.5"/>
-      <line x1="2" y1="26" x2="38" y2="14" stroke="#C9A84C" stroke-width="0.4" opacity="0.5"/>
-      <circle cx="20" cy="20" r="2" fill="#C9A84C" opacity="0.7"/>
+      <polygon points="20,2 38,14 38,26 20,38 2,26 2,14" stroke="#E5E4E2" stroke-width="1" fill="rgba(229,228,226,0.04)"/>
+      <polygon points="20,8 32,16 32,24 20,32 8,24 8,16" stroke="#E5E4E2" stroke-width="0.5" fill="rgba(229,228,226,0.07)" opacity="0.6"/>
+      <line x1="20" y1="2" x2="20" y2="38" stroke="#E5E4E2" stroke-width="0.4" opacity="0.4"/>
+      <line x1="2" y1="14" x2="38" y2="26" stroke="#E5E4E2" stroke-width="0.4" opacity="0.4"/>
+      <line x1="2" y1="26" x2="38" y2="14" stroke="#E5E4E2" stroke-width="0.4" opacity="0.4"/>
+      <circle cx="20" cy="20" r="2" fill="#F7E7CE" opacity="0.7"/>
     </svg>
     <span class="logo-text">IDT
       <span class="logo-sub">International Diamond Trade</span>
     </span>
   </a>
-
   <div class="header-right">
-    <span class="badge-admin">Admin</span>
-    <button class="btn-logout" id="logout-btn">Sign Out</button>
+    <span class="badge-role">Admin</span>
+    <button class="btn-signout">Sign Out</button>
   </div>
 </header>
 
 <main class="page">
 
-  <div class="welcome-eyebrow">Dashboard</div>
-  <h1 class="welcome-heading">Admin Panel</h1>
-  <p class="welcome-sub">Manage users, roles, and platform activity across IDT.</p>
-
-  <div class="section-label">Platform Stats</div>
+  <div class="welcome-eyebrow">Admin Portal</div>
+  <h1 class="welcome-heading">Platform Overview</h1>
+  <p class="welcome-sub">Monitor suppliers, buyers, and platform activity across IDT.</p>
 
   <div class="stats-row">
     <div class="stat-card">
-      <div class="stat-label">Total Users</div>
-      <div class="stat-value loading" id="stat-total">—</div>
+      <span class="stat-num">14</span>
+      <span class="stat-lbl">Suppliers</span>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Buyers</div>
-      <div class="stat-value loading" id="stat-buyers">—</div>
+      <span class="stat-num">38</span>
+      <span class="stat-lbl">Buyers</span>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Suppliers</div>
-      <div class="stat-value loading" id="stat-suppliers">—</div>
+      <span class="stat-num">127</span>
+      <span class="stat-lbl">Active Listings</span>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Pending (No Role)</div>
-      <div class="stat-value loading" id="stat-pending">—</div>
+      <span class="stat-num">$4.2M</span>
+      <span class="stat-lbl">Platform Value</span>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <div class="section-label">All Users</div>
+  <div class="section-label">Suppliers</div>
 
   <div class="table-wrap">
     <div class="table-scroll">
@@ -464,199 +269,182 @@ tbody td {
         <thead>
           <tr>
             <th>Company</th>
-            <th>Email</th>
-            <th>Current Role</th>
+            <th>Location</th>
+            <th>Listings</th>
             <th>Joined</th>
-            <th>Change Role</th>
+            <th>Status</th>
           </tr>
         </thead>
-        <tbody id="users-tbody">
-          <tr><td colspan="5" class="table-empty">Loading users…</td></tr>
+        <tbody>
+          <tr>
+            <td class="td-name">Khalid Diamonds Co</td>
+            <td class="td-loc">Dubai, UAE</td>
+            <td class="td-num">12</td>
+            <td class="td-date">Jan 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Al Mazroui Gems</td>
+            <td class="td-loc">Abu Dhabi, UAE</td>
+            <td class="td-num">9</td>
+            <td class="td-date">Feb 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Prestige Stones</td>
+            <td class="td-loc">Antwerp, Belgium</td>
+            <td class="td-num">18</td>
+            <td class="td-date">Dec 2024</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Rosenthal Diamonds</td>
+            <td class="td-loc">Tel Aviv, Israel</td>
+            <td class="td-num">7</td>
+            <td class="td-date">Mar 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Orient Gem Trading</td>
+            <td class="td-loc">Mumbai, India</td>
+            <td class="td-num">14</td>
+            <td class="td-date">Jan 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Swiss Diamond House</td>
+            <td class="td-loc">Geneva, Switzerland</td>
+            <td class="td-num">11</td>
+            <td class="td-date">Feb 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
+  <div class="section-label">Buyers</div>
+
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Inquiries</th>
+            <th>Joined</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-name">Al Futtaim Trading</td>
+            <td class="td-loc">Dubai, UAE</td>
+            <td class="td-num">4</td>
+            <td class="td-date">Feb 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Roshan Jewellers</td>
+            <td class="td-loc">Mumbai, India</td>
+            <td class="td-num">7</td>
+            <td class="td-date">Jan 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Geneva Luxury Group</td>
+            <td class="td-loc">Geneva, Switzerland</td>
+            <td class="td-num">3</td>
+            <td class="td-date">Mar 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Maison Dorée</td>
+            <td class="td-loc">Paris, France</td>
+            <td class="td-num">5</td>
+            <td class="td-date">Feb 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Crown Jewels Ltd</td>
+            <td class="td-loc">London, UK</td>
+            <td class="td-num">2</td>
+            <td class="td-date">Apr 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+          <tr>
+            <td class="td-name">Al Rajhi Gems</td>
+            <td class="td-loc">Riyadh, Saudi Arabia</td>
+            <td class="td-num">6</td>
+            <td class="td-date">Jan 2025</td>
+            <td><span class="badge-active-sm">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label">Recent Inquiries</div>
+
+  <div class="feed">
+    <div class="feed-item">
+      <div class="feed-dot new-dot"></div>
+      <div>
+        <div class="feed-parties">Al Futtaim Trading &nbsp;→&nbsp; Khalid Diamonds Co</div>
+        <div class="feed-subject">4.2ct Cushion D/IF — GIA Certified</div>
+      </div>
+      <div class="feed-right">
+        <span class="badge-new-feed">New</span>
+        <span class="feed-time">2 days ago</span>
+      </div>
+    </div>
+    <div class="feed-item">
+      <div class="feed-dot"></div>
+      <div>
+        <div class="feed-parties">Roshan Jewellers &nbsp;→&nbsp; Prestige Stones</div>
+        <div class="feed-subject">3.1ct Oval E/VS1 — GIA Certified</div>
+      </div>
+      <div class="feed-right">
+        <span class="badge-responded-feed">Responded</span>
+        <span class="feed-time">4 days ago</span>
+      </div>
+    </div>
+    <div class="feed-item">
+      <div class="feed-dot new-dot"></div>
+      <div>
+        <div class="feed-parties">Geneva Luxury Group &nbsp;→&nbsp; Swiss Diamond House</div>
+        <div class="feed-subject">6 matched stones for bracelet commission</div>
+      </div>
+      <div class="feed-right">
+        <span class="badge-new-feed">New</span>
+        <span class="feed-time">1 week ago</span>
+      </div>
+    </div>
+    <div class="feed-item">
+      <div class="feed-dot"></div>
+      <div>
+        <div class="feed-parties">Maison Dorée &nbsp;→&nbsp; Orient Gem Trading</div>
+        <div class="feed-subject">2.4ct Round Brilliant D/VVS1</div>
+      </div>
+      <div class="feed-right">
+        <span class="badge-pending-feed">Pending</span>
+        <span class="feed-time">1 week ago</span>
+      </div>
+    </div>
+    <div class="feed-item">
+      <div class="feed-dot"></div>
+      <div>
+        <div class="feed-parties">Crown Jewels Ltd &nbsp;→&nbsp; Rosenthal Diamonds</div>
+        <div class="feed-subject">1.8ct Princess Cut F/VVS2</div>
+      </div>
+      <div class="feed-right">
+        <span class="badge-responded-feed">Responded</span>
+        <span class="feed-time">2 weeks ago</span>
+      </div>
+    </div>
+  </div>
+
 </main>
-
-<div class="toast" id="toast"></div>
-
-<script>
-const SUPABASE_URL  = 'https://hlmdkhixdrowbnxgbuvy.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsbWRraGl4ZHJvd2JueGdidXZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NDIzMjQsImV4cCI6MjA5MjAxODMyNH0.2QOyrIHHReHH2prRCP78UcO1I3oCqauKpn_0pjpP7W8';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-// ── Toast ──
-let toastTimer;
-function showToast(msg, isError = false) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.toggle('error', isError);
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
-}
-
-// ── Format date ──
-function fmtDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-// ── Role badge HTML ──
-function roleBadge(role) {
-  const r = role || 'pending';
-  const label = r.charAt(0).toUpperCase() + r.slice(1);
-  return `<span class="role-badge ${r}">${label}</span>`;
-}
-
-// ── Role dropdown ──
-function roleSelect(userId, currentRole) {
-  const roles = ['buyer', 'supplier', 'admin'];
-  const opts = roles.map(r =>
-    `<option value="${r}" ${r === currentRole ? 'selected' : ''}>${r.charAt(0).toUpperCase() + r.slice(1)}</option>`
-  ).join('');
-  return `<select class="role-select" data-uid="${userId}" onchange="changeRole(this)">${opts}</select>`;
-}
-
-// ── Change role ──
-async function changeRole(select) {
-  const uid = select.dataset.uid;
-  const newRole = select.value;
-  select.classList.add('saving');
-
-  const { error } = await db
-    .from('profiles')
-    .update({ role: newRole })
-    .eq('id', uid);
-
-  select.classList.remove('saving');
-
-  if (error) {
-    showToast('Failed to update role.', true);
-  } else {
-    // Update badge in same row
-    const row = select.closest('tr');
-    row.querySelector('.role-badge').outerHTML;
-    const badgeCell = row.querySelector('td:nth-child(3)');
-    badgeCell.innerHTML = roleBadge(newRole);
-    showToast('Role updated successfully.');
-  }
-}
-
-// ── Load stats ──
-async function loadStats() {
-  const { data, error } = await db.from('profiles').select('role');
-  if (error || !data) return;
-
-  const total     = data.length;
-  const buyers    = data.filter(p => p.role === 'buyer').length;
-  const suppliers = data.filter(p => p.role === 'supplier').length;
-  const pending   = data.filter(p => !p.role || (p.role !== 'buyer' && p.role !== 'supplier' && p.role !== 'admin')).length;
-
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    el.textContent = val;
-    el.classList.remove('loading');
-  };
-
-  set('stat-total',     total);
-  set('stat-buyers',    buyers);
-  set('stat-suppliers', suppliers);
-  set('stat-pending',   pending);
-}
-
-// ── Load users table ──
-async function loadUsers() {
-  const tbody = document.getElementById('users-tbody');
-
-  const { data, error } = await db
-    .from('profiles')
-    .select('id, company_name, role, created_at, email')
-    .order('created_at', { ascending: false });
-
-  if (error || !data) {
-    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">Failed to load users.</td></tr>`;
-    return;
-  }
-
-  if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">No users found.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = data.map(p => `
-    <tr>
-      <td><div class="company-name">${p.company_name || '—'}</div></td>
-      <td><div class="email-cell">${p.email || '—'}</div></td>
-      <td>${roleBadge(p.role)}</td>
-      <td><span class="date-cell">${fmtDate(p.created_at)}</span></td>
-      <td>${roleSelect(p.id, p.role)}</td>
-    </tr>
-  `).join('');
-}
-
-// ── Auth guard + init ──
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  await db.auth.signOut();
-  window.location.replace('https://internationaldiamondtrade.com/login.html');
-});
-
-async function getSessionWithRetry() {
-  for (let i = 0; i < 10; i++) {
-    const { data: { session } } = await db.auth.getSession();
-    if (session) return session;
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return null;
-}
-
-async function getRoleWithRetry(session) {
-  for (let i = 0; i < 10; i++) {
-    let role = session.user.user_metadata?.role;
-
-    if (!role) {
-      const { data: profile } = await db
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-      role = profile?.role;
-    }
-
-    if (role) return role;
-
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return null;
-}
-
-(async () => {
-  const session = await getSessionWithRetry();
-
-  if (!session) {
-    window.location.replace('https://internationaldiamondtrade.com/login.html');
-    return;
-  }
-
-  const role = await getRoleWithRetry(session);
-
-  if (!role) {
-    window.location.replace('https://internationaldiamondtrade.com/login.html');
-    return;
-  }
-
-  if (role && window.location.pathname === '/admin.html' && role !== 'admin') {
-    window.location.replace('/buyer.html');
-    return;
-  }
-
-  document.body.classList.add('ready');
-  loadStats();
-  loadUsers();
-})();
-</script>
 </body>
 </html>
