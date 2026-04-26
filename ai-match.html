@@ -517,9 +517,10 @@ async function sendMessage(text){
       })
     });
 
-    if(!res.ok) throw new Error(`${res.status}`);
-
     const data = await res.json();
+
+    if(!res.ok) throw new Error(JSON.stringify(data.error || data));
+
     const reply = data.content?.[0]?.text || '';
 
     conversationHistory.push({role: 'assistant', content: reply});
@@ -529,8 +530,9 @@ async function sendMessage(text){
 
   } catch(e){
     removeTyping();
-    showError();
     conversationHistory.pop();
+    const detail = e.message || 'Unknown error';
+    createBubble('ai', `<span style="color:#f87171;font-size:13px">Error: ${detail}</span>`);
   }
 
   busy = false;
