@@ -8,10 +8,6 @@
   ],
   "routes": [
     { "src": "/api/chat", "dest": "/api/chat.js" },
-    { "src": "/buyer", "dest": "/buyer.html" },
-    { "src": "/supplier", "dest": "/supplier.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/join", "dest": "/join.html" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }
