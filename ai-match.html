@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Diamond Matching — IDT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0A0A;
+  --surface:#121212;
+  --card:#181818;
+  --gold:#E5E4E2;
+  --gold-l:#F7E7CE;
+  --platinum:#DADADA;
+  --emerald:#0B3D2E;
+  --emerald-h:#134a38;
+  --emerald-dim:rgba(11,61,46,.18);
+  --txt:#E5E4E2;
+  --muted:#787878;
+  --border:rgba(229,228,226,.09);
+  --border-h:rgba(229,228,226,.22);
+  --green:#4CAF7D;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column}
+
+/* ── NAV ── */
+header{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:64px;
+  background:rgba(10,10,10,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:10;
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:.08em;color:var(--txt)}
+.logo-text span{color:var(--muted)}
+.header-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px}
+.header-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.ai-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--emerald);color:var(--gold-l);
+  font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  padding:5px 12px;border-radius:20px;
+  animation:badgePulse 2.4s ease-in-out infinite;
+}
+.ai-badge::before{content:'✦';font-size:9px}
+@keyframes badgePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(11,61,46,.6)}
+  50%{box-shadow:0 0 0 8px rgba(11,61,46,0)}
+}
+
+/* ── CHAT AREA ── */
+.chat-wrap{flex:1;overflow-y:auto;padding:32px 0 16px;scroll-behavior:smooth}
+.chat-wrap::-webkit-scrollbar{width:4px}
+.chat-wrap::-webkit-scrollbar-track{background:transparent}
+.chat-wrap::-webkit-scrollbar-thumb{background:rgba(229,228,226,.12);border-radius:2px}
+
+.messages{max-width:760px;margin:0 auto;padding:0 24px;display:flex;flex-direction:column;gap:20px}
+
+/* bubble base */
+.msg{display:flex;gap:12px;animation:msgIn .35s cubic-bezier(.25,.46,.45,.94) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* AI bubble */
+.msg.ai{align-items:flex-start}
+.msg.ai .avatar{
+  width:32px;height:32px;flex-shrink:0;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;margin-top:2px;
+}
+.msg.ai .bubble{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:0 16px 16px 16px;
+  padding:14px 18px;max-width:82%;
+  font-size:14px;line-height:1.75;color:var(--txt);
+}
+
+/* user bubble */
+.msg.user{align-items:flex-end;flex-direction:row-reverse}
+.msg.user .bubble{
+  background:var(--emerald-dim);border:1px solid rgba(11,61,46,.4);
+  border-radius:16px 0 16px 16px;
+  padding:14px 18px;max-width:78%;
+  font-size:14px;line-height:1.75;color:var(--gold-l);
+}
+
+/* chips */
+.chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{
+  background:transparent;border:1px solid var(--border-h);
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;
+  padding:7px 14px;border-radius:20px;cursor:pointer;
+  transition:all .3s cubic-bezier(.25,.46,.45,.94);
+}
+.chip:hover{background:var(--emerald-dim);border-color:rgba(11,61,46,.55);color:var(--gold-l)}
+
+/* typing indicator */
+.msg.typing .bubble{padding:16px 20px}
+.dots{display:flex;gap:5px;align-items:center}
+.dots span{
+  width:6px;height:6px;background:var(--muted);border-radius:50%;
+  animation:dot 1.3s ease-in-out infinite;
+}
+.dots span:nth-child(2){animation-delay:.18s}
+.dots span:nth-child(3){animation-delay:.36s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+/* match card inside bubble */
+.match-card{
+  margin-top:10px;padding:12px 16px;
+  background:rgba(229,228,226,.04);border:1px solid var(--border);
+  border-radius:10px;
+}
+.match-card + .match-card{margin-top:8px}
+.match-rank{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.match-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:var(--gold-l);margin-bottom:2px}
+.match-loc{font-size:11px;color:var(--muted);margin-bottom:6px}
+.match-why{font-size:12px;color:var(--platinum);line-height:1.65}
+
+/* ── INPUT BAR ── */
+.input-wrap{
+  flex-shrink:0;
+  padding:16px 24px 24px;
+  background:linear-gradient(to top,rgba(10,10,10,1) 70%,rgba(10,10,10,0));
+}
+.input-inner{
+  max-width:760px;margin:0 auto;
+  display:flex;gap:10px;align-items:flex-end;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:10px 10px 10px 18px;
+  transition:border-color .3s;
+}
+.input-inner:focus-within{border-color:var(--border-h)}
+#user-input{
+  flex:1;background:transparent;border:none;outline:none;resize:none;
+  color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;
+  max-height:120px;overflow-y:auto;padding-top:4px;
+}
+#user-input::placeholder{color:var(--muted)}
+#user-input::-webkit-scrollbar{width:3px}
+#user-input::-webkit-scrollbar-thumb{background:rgba(229,228,226,.1)}
+.send-btn{
+  width:40px;height:40px;flex-shrink:0;
+  background:var(--emerald);border:none;border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .3s cubic-bezier(.25,.46,.45,.94);
+}
+.send-btn:hover{background:var(--emerald-h);transform:scale(1.06)}
+.send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.send-btn svg{width:17px;height:17px;stroke:var(--gold-l);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* error toast */
+.error-toast{
+  display:none;text-align:center;font-size:12px;color:#f87171;
+  margin-bottom:8px;max-width:760px;margin-left:auto;margin-right:auto;padding:0 24px;
+}
+
+/* typewriter cursor */
+.cursor{display:inline-block;width:2px;height:14px;background:var(--gold);margin-left:2px;vertical-align:middle;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <svg width="30" height="30" viewBox="0 0 36 36" fill="none">
+      <polygon points="18,2 34,12 34,24 18,34 2,24 2,12" stroke="#E5E4E2" stroke-width="1.5" fill="none"/>
+      <polygon points="18,7 27,13 27,23 18,29 9,23 9,13" stroke="#E5E4E2" stroke-width=".7" fill="none" opacity=".4"/>
+    </svg>
+    <span class="logo-text">IDT <span>— International Diamond Trade</span></span>
+  </a>
+  <div class="header-center">
+    <span class="header-title">AI Diamond Matching</span>
+  </div>
+  <div class="ai-badge">AI MODE</div>
+</header>
+
+<div class="chat-wrap" id="chat-wrap">
+  <div class="messages" id="messages"></div>
+</div>
+
+<div class="input-wrap">
+  <div class="error-toast" id="error-toast">Connection issue — please try again.</div>
+  <div class="input-inner">
+    <textarea id="user-input" rows="1" placeholder="Describe what you're looking for…" autocomplete="off"></textarea>
+    <button class="send-btn" id="send-btn" disabled>
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are an expert AI diamond matching assistant for International Diamond Trade (IDT), a premium B2B diamond marketplace. Match buyers with suppliers or suppliers with buyers based on requirements.
+
+SUPPLIER DATABASE:
+1. Khalid Diamonds Co, Dubai — Round Brilliants and Cushion cuts, D-F color, VVS1-VS1, 1.5-5ct, GIA certified, $15,000-$70,000
+2. Al Mazroui Gems, Abu Dhabi — Oval and Pear shapes, E-G color, VS1-VS2, 1-3ct, GIA and IGI certified, $10,000-$45,000
+3. Prestige Stones, Antwerp — All shapes, D-E color, IF-VVS2, 2-8ct, GIA only, ultra premium, $40,000-$200,000
+4. Rosenthal Diamonds, Tel Aviv — Princess and Emerald cuts, F-H color, VS1-SI1, 0.5-3ct, GIA certified, $5,000-$30,000
+5. Orient Gem Trading, Mumbai — Mixed shapes, G-I color, VS2-SI2, 0.3-2ct, IGI certified, budget friendly, $2,000-$15,000
+6. Swiss Diamond House, Geneva — Round and Oval, D-F color, IF-VVS1, 3-10ct, GIA certified, ultra luxury, $80,000-$500,000
+
+BUYER DATABASE:
+1. Al Futtaim Trading, Dubai — Cushion and Round, D/E color, VVS1-VS1, 3ct+, GIA only, $50,000-$150,000 per stone
+2. Roshan Jewellers, Mumbai — Round Brilliants bulk, F-G color, VS1-VS2, 1-2ct, $8,000-$20,000 per stone
+3. Geneva Luxury Group, Geneva — Matched sets, D color, IF-VVS1, 0.5-1ct each, GIA, $200,000 total budget
+4. Maison Dorée, Paris — Oval and Pear, E-F color, VVS2-VS1, 2-4ct, $30,000-$80,000 per stone
+5. Crown Jewels Ltd, London — Princess cuts, F-G color, VS1-VS2, 1.5-2.5ct, GIA, $15,000-$35,000 per stone
+6. Al Rajhi Gems, Riyadh — Large Cushions and Rounds, D-E color, VVS1, 4ct+, GIA, $100,000-$300,000 per stone
+
+RULES:
+- Be concise, professional, and luxury-appropriate
+- When matching, explain WHY each match fits
+- Always suggest 2-3 ranked matches
+- Format: Supplier/Buyer name, location, why they match
+- Keep responses under 150 words
+- If user wants to send inquiry, confirm it is sent (simulated)
+- Never invent data outside the database`;
+
+const CHIPS = [
+  "I need a 3ct+ Round Brilliant, D color, GIA certified",
+  "Looking for Oval diamonds around $40,000",
+  "I have 12 Princess cut diamonds to sell, F color VS1",
+  "Need matched stones for a bracelet project",
+  "Best supplier for bulk smaller diamonds"
+];
+
+const OPENING = "Welcome to IDT AI Matching. I'm here to connect you with the right diamond partners. Are you looking to buy or sell today?";
+
+const messagesEl = document.getElementById('messages');
+const chatWrap   = document.getElementById('chat-wrap');
+const inputEl    = document.getElementById('user-input');
+const sendBtn    = document.getElementById('send-btn');
+const errorToast = document.getElementById('error-toast');
+
+let conversationHistory = [];
+let chipsShown = true;
+let busy = false;
+
+/* ── UTILITIES ── */
+function scrollBottom(smooth = true){
+  chatWrap.scrollTo({top: chatWrap.scrollHeight, behavior: smooth ? 'smooth' : 'instant'});
+}
+
+function createBubble(role, content){
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+  if(role === 'ai'){
+    wrap.innerHTML = `<div class="avatar">✦</div><div class="bubble"></div>`;
+    wrap.querySelector('.bubble').innerHTML = content;
+  } else {
+    wrap.innerHTML = `<div class="bubble"></div>`;
+    wrap.querySelector('.bubble').textContent = content;
+  }
+  messagesEl.appendChild(wrap);
+  scrollBottom();
+  return wrap;
+}
+
+function showTyping(){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ai typing';
+  wrap.id = 'typing';
+  wrap.innerHTML = `<div class="avatar">✦</div><div class="bubble"><div class="dots"><span></span><span></span><span></span></div></div>`;
+  messagesEl.appendChild(wrap);
+  scrollBottom();
+}
+
+function removeTyping(){
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+function hideError(){ errorToast.style.display = 'none'; }
+function showError(){ errorToast.style.display = 'block'; scrollBottom(); }
+
+/* ── TYPEWRITER OPENING ── */
+function typewriter(text, onDone){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ai';
+  wrap.innerHTML = `<div class="avatar">✦</div><div class="bubble"><span id="tw-text"></span><span class="cursor"></span></div>`;
+  messagesEl.appendChild(wrap);
+
+  const span = wrap.querySelector('#tw-text');
+  const cursor = wrap.querySelector('.cursor');
+  let i = 0;
+
+  function tick(){
+    if(i <= text.length){
+      span.textContent = text.slice(0, i);
+      i++;
+      scrollBottom(false);
+      setTimeout(tick, i < 10 ? 40 : 28);
+    } else {
+      cursor.remove();
+      if(onDone) onDone(wrap.querySelector('.bubble'));
+    }
+  }
+  tick();
+}
+
+/* ── CHIPS ── */
+function appendChips(bubbleEl){
+  const div = document.createElement('div');
+  div.className = 'chips-wrap';
+  div.id = 'chips';
+  CHIPS.forEach(text => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = text;
+    btn.addEventListener('click', () => {
+      removeChips();
+      sendMessage(text);
+    });
+    div.appendChild(btn);
+  });
+  bubbleEl.appendChild(div);
+  scrollBottom();
+}
+
+function removeChips(){
+  const c = document.getElementById('chips');
+  if(c){ c.style.opacity = '0'; c.style.transition = 'opacity .25s'; setTimeout(()=>c.remove(), 250); }
+  chipsShown = false;
+}
+
+/* ── SEND ── */
+async function sendMessage(text){
+  if(busy || !text.trim()) return;
+  busy = true;
+  sendBtn.disabled = true;
+  hideError();
+
+  if(chipsShown) removeChips();
+
+  createBubble('user', text);
+  conversationHistory.push({role: 'user', content: text});
+
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'x-api-key': window.__IDT_AI_KEY__ || ''
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: conversationHistory
+      })
+    });
+
+    if(!res.ok) throw new Error(`${res.status}`);
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || '';
+
+    conversationHistory.push({role: 'assistant', content: reply});
+
+    removeTyping();
+    createBubble('ai', formatReply(reply));
+
+  } catch(e){
+    removeTyping();
+    showError();
+    conversationHistory.pop();
+  }
+
+  busy = false;
+  sendBtn.disabled = inputEl.value.trim() === '';
+  inputEl.focus();
+}
+
+/* ── REPLY FORMATTER ── */
+function formatReply(text){
+  /* light markdown: bold (**text**), line breaks */
+  let html = text
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n{2,}/g,'</p><p style="margin-top:10px">')
+    .replace(/\n/g,'<br>');
+  return `<p>${html}</p>`;
+}
+
+/* ── INPUT AUTO-RESIZE ── */
+inputEl.addEventListener('input', ()=>{
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+  sendBtn.disabled = inputEl.value.trim() === '' || busy;
+});
+
+inputEl.addEventListener('keydown', e=>{
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    const val = inputEl.value.trim();
+    if(val && !busy){
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+      sendBtn.disabled = true;
+      sendMessage(val);
+    }
+  }
+});
+
+sendBtn.addEventListener('click', ()=>{
+  const val = inputEl.value.trim();
+  if(val && !busy){
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+    sendMessage(val);
+  }
+});
+
+/* ── INIT ── */
+(function init(){
+  setTimeout(()=>{
+    typewriter(OPENING, (bubbleEl)=>{
+      appendChips(bubbleEl);
+      inputEl.removeAttribute('disabled');
+      inputEl.focus();
+    });
+  }, 400);
+})();
+</script>
+</body>
+</html>
