@@ -508,9 +508,9 @@ async function sendMessage(text){
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': 'ANTHROPIC_API_KEY_PLACEHOLDER',
         'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'x-api-key': window.__IDT_AI_KEY__ || ''
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
