@@ -92,15 +92,49 @@ header{
   font-size:14px;line-height:1.75;color:var(--gold-l);
 }
 
-/* chips */
-.chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.chip{
-  background:transparent;border:1px solid var(--border-h);
-  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;
-  padding:7px 14px;border-radius:20px;cursor:pointer;
-  transition:all .3s cubic-bezier(.25,.46,.45,.94);
+/* ── SCENARIO CHIPS UI ── */
+.chips-container{margin-top:16px}
+
+.tabs-row{display:flex;gap:6px;margin-bottom:12px}
+.tab-btn{
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;padding:6px 16px;border-radius:20px;
+  cursor:pointer;transition:all .3s cubic-bezier(.25,.46,.45,.94);
 }
-.chip:hover{background:var(--emerald-dim);border-color:rgba(11,61,46,.55);color:var(--gold-l)}
+.tab-btn:hover{border-color:var(--border-h);color:var(--gold)}
+.tab-btn.active{
+  background:var(--emerald);border-color:var(--emerald);
+  color:var(--gold-l);
+}
+
+.chips-panel{display:none;flex-direction:column;gap:0}
+.chips-panel.active{display:flex}
+
+.chips-grid{display:flex;flex-wrap:wrap;gap:7px}
+
+.chip{
+  background:transparent;border:1px solid rgba(11,61,46,.5);
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11.5px;
+  padding:6px 13px;border-radius:20px;cursor:pointer;
+  transition:all .28s cubic-bezier(.25,.46,.45,.94);
+  text-align:left;
+}
+.chip:hover{
+  background:var(--emerald-dim);border-color:rgba(11,61,46,.85);
+  color:var(--gold-l);transform:translateY(-1px);
+}
+
+.show-more-btn{
+  background:transparent;border:none;
+  color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;
+  cursor:pointer;padding:10px 2px 2px;
+  display:flex;align-items:center;gap:5px;
+  transition:color .25s;
+}
+.show-more-btn:hover{color:var(--gold-l)}
+.show-more-btn::after{content:'→';font-size:12px;transition:transform .25s}
+.show-more-btn:hover::after{transform:translateX(3px)}
 
 /* typing indicator */
 .msg.typing .bubble{padding:16px 20px}
@@ -224,16 +258,66 @@ RULES:
 - Format: Supplier/Buyer name, location, why they match
 - Keep responses under 150 words
 - If user wants to send inquiry, confirm it is sent (simulated)
-- Never invent data outside the database`;
+- Never invent data outside the database
+- When a user selects a buying scenario, first confirm you understand their need, then match 2-3 suppliers. When a user selects a selling scenario, match 2-3 buyers. Always explain the match reason clearly.`;
 
-const CHIPS = [
+const BUYER_SCENARIOS = [
   "I need a 3ct+ Round Brilliant, D color, GIA certified",
   "Looking for Oval diamonds around $40,000",
-  "I have 12 Princess cut diamonds to sell, F color VS1",
   "Need matched stones for a bracelet project",
-  "Best supplier for bulk smaller diamonds"
+  "Best supplier for bulk smaller diamonds under $10,000",
+  "Looking for a 5ct Cushion, D/IF, GIA only",
+  "I need 10 matched Round Brilliants for a tennis bracelet, 0.5ct each",
+  "Looking for Emerald cut, F color, VS1, around 2ct",
+  "Need a Pear shape for an engagement ring, E color, VVS2, 1.5-2ct",
+  "Budget is $200,000, want the best possible stone",
+  "Looking for IGI certified diamonds, G color, good value",
+  "Need Princess cuts in bulk, F-G color, 1-1.5ct",
+  "Want a statement piece, 8ct+, any shape, D color",
+  "Looking for Antwerp suppliers for high end stones",
+  "Need diamonds for a luxury watch dial, very small, D color IF",
+  "I represent a Paris jewelry house, need consistent supply of Ovals",
+  "Looking for a D/IF Round Brilliant, 4ct, for a solitaire ring",
+  "Need 50 small Rounds, 0.3ct each, G color VS2, IGI certified",
+  "Budget $500,000, need the best stones available on platform",
+  "Looking for fancy shapes, pear and marquise, E-F color",
+  "Need a supplier who can do large orders consistently",
+  "Looking for Cushion cuts specifically from Gulf region suppliers",
+  "Need VS1 or better clarity, any shape, around 2-3ct, under $50,000",
+  "I want to see what D/VVS1 stones are available right now",
+  "Looking for certified stones for resale in European market",
+  "Need a reliable supplier for long term partnership, high volume"
 ];
 
+const SELLER_SCENARIOS = [
+  "I have 12 Princess cut diamonds to sell, F color VS1",
+  "I have a 6ct Round Brilliant D/IF GIA, looking for serious buyers",
+  "Have 30 Oval diamonds, E-F color, VS1-VS2, 1.5-2ct each",
+  "I have matched pairs of Pear shapes, D color, VVS1",
+  "Looking to sell 100 small Rounds, 0.3-0.5ct, G-H color, IGI cert",
+  "Have a parcel of 20 Princess cuts, mixed grades, F-H color",
+  "Selling a 10ct Cushion, D color, IF clarity, GIA certified",
+  "Have Emerald cuts in stock, G color VS1, 1-3ct range",
+  "Looking for buyers who take large volumes, mixed shapes",
+  "Have 5 matched Rounds for a bracelet, 1ct each, E/VVS2",
+  "Selling Antwerp-sourced stones, all D-E color, GIA only",
+  "Have a collection of fancy shapes, all GIA, E-F color",
+  "Looking to move inventory quickly, competitive pricing available",
+  "Have 8ct Round Brilliant, need a serious luxury buyer",
+  "Selling matched Ovals for a jewelry set, E color VVS1",
+  "Have bulk Princess cuts, looking for Indian market buyers",
+  "Selling high end stones, 3ct+ each, D/IF, GIA, asking $60,000+",
+  "Have IGI certified mixed parcel, G-H color, good for resale",
+  "Looking for European buyers for my Antwerp stock",
+  "Have 4 Cushion cuts, D/VVS1, 2ct each, GIA certified",
+  "Selling Pear shapes for Paris jewelry market",
+  "Have Round Brilliants in bulk, F color, VS1, 1ct each",
+  "Looking for Gulf region buyers for large stones",
+  "Have a 7ct Emerald cut, E/VVS2, GIA, looking for right buyer",
+  "Selling mixed parcel, all GIA, competitive prices, quick deal"
+];
+
+const VISIBLE_COUNT = 6;
 const OPENING = "Welcome to IDT AI Matching. I'm here to connect you with the right diamond partners. Are you looking to buy or sell today?";
 
 const messagesEl = document.getElementById('messages');
@@ -309,27 +393,99 @@ function typewriter(text, onDone){
 }
 
 /* ── CHIPS ── */
-function appendChips(bubbleEl){
-  const div = document.createElement('div');
-  div.className = 'chips-wrap';
-  div.id = 'chips';
-  CHIPS.forEach(text => {
+function buildChipGrid(scenarios, container){
+  const grid = document.createElement('div');
+  grid.className = 'chips-grid';
+
+  scenarios.forEach((text, idx) => {
     const btn = document.createElement('button');
     btn.className = 'chip';
     btn.textContent = text;
+    if(idx >= VISIBLE_COUNT) btn.style.display = 'none';
     btn.addEventListener('click', () => {
       removeChips();
       sendMessage(text);
     });
-    div.appendChild(btn);
+    grid.appendChild(btn);
   });
-  bubbleEl.appendChild(div);
+
+  container.appendChild(grid);
+
+  if(scenarios.length > VISIBLE_COUNT){
+    const more = document.createElement('button');
+    more.className = 'show-more-btn';
+    more.textContent = `Show ${scenarios.length - VISIBLE_COUNT} more scenarios\u00a0`;
+    let expanded = false;
+    more.addEventListener('click', () => {
+      expanded = !expanded;
+      grid.querySelectorAll('.chip').forEach((c, i) => {
+        if(i >= VISIBLE_COUNT) c.style.display = expanded ? '' : 'none';
+      });
+      more.textContent = expanded
+        ? `Show fewer\u00a0`
+        : `Show ${scenarios.length - VISIBLE_COUNT} more scenarios\u00a0`;
+      scrollBottom();
+    });
+    container.appendChild(more);
+  }
+}
+
+function appendChips(bubbleEl){
+  const container = document.createElement('div');
+  container.className = 'chips-container';
+  container.id = 'chips';
+
+  /* tabs */
+  const tabsRow = document.createElement('div');
+  tabsRow.className = 'tabs-row';
+
+  const buyTab  = document.createElement('button');
+  buyTab.className  = 'tab-btn active';
+  buyTab.textContent = 'I want to Buy';
+
+  const sellTab = document.createElement('button');
+  sellTab.className = 'tab-btn';
+  sellTab.textContent = 'I want to Sell';
+
+  tabsRow.appendChild(buyTab);
+  tabsRow.appendChild(sellTab);
+  container.appendChild(tabsRow);
+
+  /* panels */
+  const buyPanel  = document.createElement('div');
+  buyPanel.className  = 'chips-panel active';
+  buildChipGrid(BUYER_SCENARIOS, buyPanel);
+
+  const sellPanel = document.createElement('div');
+  sellPanel.className = 'chips-panel';
+  buildChipGrid(SELLER_SCENARIOS, sellPanel);
+
+  container.appendChild(buyPanel);
+  container.appendChild(sellPanel);
+
+  /* tab switching */
+  buyTab.addEventListener('click', () => {
+    buyTab.classList.add('active');   sellTab.classList.remove('active');
+    buyPanel.classList.add('active'); sellPanel.classList.remove('active');
+    scrollBottom();
+  });
+  sellTab.addEventListener('click', () => {
+    sellTab.classList.add('active');  buyTab.classList.remove('active');
+    sellPanel.classList.add('active');buyPanel.classList.remove('active');
+    scrollBottom();
+  });
+
+  bubbleEl.appendChild(container);
   scrollBottom();
 }
 
 function removeChips(){
   const c = document.getElementById('chips');
-  if(c){ c.style.opacity = '0'; c.style.transition = 'opacity .25s'; setTimeout(()=>c.remove(), 250); }
+  if(c){
+    c.style.opacity = '0';
+    c.style.transition = 'opacity .25s';
+    setTimeout(() => c.remove(), 250);
+  }
   chipsShown = false;
 }
 
@@ -387,7 +543,6 @@ async function sendMessage(text){
 
 /* ── REPLY FORMATTER ── */
 function formatReply(text){
-  /* light markdown: bold (**text**), line breaks */
   let html = text
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
